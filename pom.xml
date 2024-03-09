@@ -7,5 +7,13 @@
     <groupId>dm</groupId>
     <artifactId>KMeansClustering</artifactId>
     <version>1.0-SNAPSHOT</version>
-    
+
+    <dependencies>
+        <dependency>
+            <groupId>dm</groupId>
+            <artifactId>KDTree</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
 </project>
