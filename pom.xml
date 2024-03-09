@@ -11,8 +11,18 @@
     <dependencies>
         <dependency>
             <groupId>dm</groupId>
+            <artifactId>Graph</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>dm</groupId>
             <artifactId>KDTree</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>dm</groupId>
+            <artifactId>PanZoom</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

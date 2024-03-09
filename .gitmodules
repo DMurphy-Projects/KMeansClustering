@@ -1,3 +1,6 @@
 [submodule "KDTree"]
 	path = KDTree
 	url = https://github.com/DMurphy-Projects/KDTree
+[submodule "PanZoom"]
+	path = PanZoom
+	url = https://github.com/DMurphy-Projects/PanZoom.git
