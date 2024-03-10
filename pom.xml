@@ -10,20 +10,34 @@
 
     <dependencies>
         <dependency>
-            <groupId>dm</groupId>
-            <artifactId>Graph</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>dm</groupId>
-            <artifactId>KDTree</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <groupId>dm</groupId>
+        <artifactId>KDTree</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
         <dependency>
             <groupId>dm</groupId>
             <artifactId>PanZoom</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>KMeansTest</id>
+                        <configuration>
+                            <mainClass>KMeansTest</mainClass>
+                            <classpathScope>test</classpathScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

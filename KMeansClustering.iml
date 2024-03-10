@@ -13,8 +13,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="KDTree" />
-    <orderEntry type="module" module-name="Graph" />
-    <orderEntry type="module" module-name="PanZoom" />
+    <orderEntry type="library" name="Maven: dm:KDTree:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: dm:Graph:1.0" level="project" />
+    <orderEntry type="library" name="Maven: dm:PanZoom:1.0-SNAPSHOT" level="project" />
   </component>
 </module>
