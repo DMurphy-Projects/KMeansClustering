@@ -50,6 +50,65 @@ public class KMeansTest {
         }
     }
 
+    public static double calcDistance(double[] p1, double[] p2)
+    {
+        double d = 0;
+        for (int i=0;i<p1.length;i++)
+        {
+            d += (p1[i] - p2[i]) * (p1[i] - p2[i]);
+        }
+        return d;
+    }
+
+    public static int nearestCentroid(double[][] centroids, double[] point)
+    {
+        int nearest = -1;
+        double best = -1;
+        for (int i=0;i<centroids.length;i++)
+        {
+            double d = calcDistance(centroids[i], point);
+            if (best == -1 || best > d)
+            {
+                best = d;
+                nearest = i;
+            }
+        }
+        return nearest;
+    }
+
+    public static void assignToCentroidsNoTree(double[][] data, int[] assignedTo, double[][] centroids)
+    {
+        for (int i=0;i<data.length;i++)
+        {
+            assignedTo[i] = nearestCentroid(centroids, data[i]);;
+        }
+    }
+
+    public static void updateCentroidsNoTree(double[][] data, int[] assignedTo, double[][] list)
+    {
+        int[] count = new int[list.length];
+
+        for (int i=0;i<data.length;i++)
+        {
+            int centroidIndex = assignedTo[i];
+            count[centroidIndex]++;
+            for (int j=0;j<list[0].length;j++)
+            {
+                list[centroidIndex][j] += data[i][j];
+            }
+        }
+
+        for (int i=0;i<list.length;i++)
+        {
+            for (int j=0;j<list[0].length;j++)
+            {
+                if (count[i] > 0) {
+                    list[i][j] *= 1d / count[i];
+                }
+            }
+        }
+    }
+
     public static void updateCentroids(double[][] list, ClusteringNode node)
     {
         if (node == null) return;
@@ -119,14 +178,15 @@ public class KMeansTest {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void centroidWithTrees(int dataCount, int centroidCount, int dataSeed, int centroidSeed, boolean view)
+    {
         KMeansTest test = new KMeansTest();
 
         int dimensions = 2, iterations = 0;
-        double[][] data = test.createRandomData(100, dimensions, new Random(123));
+        double[][] data = test.createRandomData(dataCount, dimensions, new Random(dataSeed));
 
         int[] centroidAssignment = new int[data.length];
-        double[][] centroids = test.createRandomData(3, dimensions, new Random());
+        double[][] centroids = test.createRandomData(centroidCount, dimensions, new Random(centroidSeed));
 
         double delta, err = 0.1;
 
@@ -136,7 +196,7 @@ public class KMeansTest {
 
             assignToCentroids(data, centroidAssignment, centroidTree);
 
-            double[][] newCentroids = new double[centroids.length][];
+            double[][] newCentroids = new double[centroids.length][dimensions];
             updateCentroids(newCentroids, centroidTree);
 
             delta = sumArray(calculateDelta(centroids, newCentroids));
@@ -145,10 +205,92 @@ public class KMeansTest {
             iterations++;
         } while(delta > err);
 
-        System.out.println(Arrays.deepToString(centroids));
+        System.out.println(Arrays.toString(centroidAssignment));
         System.out.println(iterations);
 
-        viewPanel(data, centroidAssignment,
-                new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.BLACK});
+        if (view) {
+            try {
+                viewPanel(data, centroidAssignment,
+                        new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.BLACK});
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void centroidWithoutTrees(int dataCount, int centroidCount, int dataSeed, int centroidSeed, boolean view)
+    {
+        KMeansTest test = new KMeansTest();
+
+        int dimensions = 2, iterations = 0;
+        double[][] data = test.createRandomData(dataCount, dimensions, new Random(dataSeed));
+
+        int[] centroidAssignment = new int[data.length];
+        double[][] centroids = test.createRandomData(centroidCount, dimensions, new Random(centroidSeed));
+
+        double delta, err = 0.1;
+
+        do {
+            assignToCentroidsNoTree(data, centroidAssignment, centroids);
+
+            double[][] newCentroids = new double[centroids.length][dimensions];
+            updateCentroidsNoTree(data, centroidAssignment, newCentroids);
+
+            delta = sumArray(calculateDelta(centroids, newCentroids));
+
+            centroids = newCentroids;
+            iterations++;
+        } while(delta > err);
+
+        System.out.println(Arrays.toString(centroidAssignment));
+        System.out.println(iterations);
+
+        if (view) {
+            try {
+                viewPanel(data, centroidAssignment,
+                        new Color[]{Color.RED, Color.GREEN, Color.BLUE, Color.BLACK});
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void benchmark()
+    {
+        int dataCount = 100000, centroidCount = 1000;
+
+        long t0 = System.currentTimeMillis();
+        centroidWithTrees(dataCount, centroidCount, 123, 321, false);
+        long t1 = System.currentTimeMillis();
+        centroidWithoutTrees(dataCount, centroidCount, 123, 321, false);
+        long t2 = System.currentTimeMillis();;
+
+        System.out.println(String.format("With Tree: %s", t1 - t0));
+        System.out.println(String.format("Without Tree: %s", t2 - t1));
+    }
+
+    //note: due to non-tree method indexes in order, whilst tree method indexes based on a tree heirarchy
+    //so point indexes (and therefore coloring) cannot be directly compared
+    public static void compareVisualisation()
+    {
+        final int dataCount = 100, centroidCount = 4;
+
+        new Thread(new Runnable() {
+            public void run() {
+                centroidWithTrees(dataCount, centroidCount, 123, 123, true);
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            public void run() {
+                centroidWithoutTrees(dataCount, centroidCount, 123, 123, true);
+            }
+        }).start();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+        benchmark();
+//        compareVisualisation();
     }
 }
